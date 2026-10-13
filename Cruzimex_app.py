@@ -50,13 +50,13 @@ clasificacion_sel = st.sidebar.selectbox("Seleccionar Clasificación:", clasific
 if clasificacion_sel != "TODAS":
     df_filtrado = df_filtrado[df_filtrado['CLASIFICACION'] == clasificacion_sel]
 
-# 4. Selector de Cliente (Muestra Código + Nombre de Compañía)
+# 4. Selector de Cliente (Muestra Código + Nombre de Compañía de forma segura)
+if df_filtrado.empty:
+    st.sidebar.warning("⚠️ No hay clientes con esta combinación de filtros.")
+    st.stop()
+
 df_filtrado['ETIQUETA_CLIENTE'] = df_filtrado['CODIGO'].astype(str) + " - " + df_filtrado['NOMBRE COMPANIA'].astype(str)
 clientes_opciones = sorted(df_filtrado['ETIQUETA_CLIENTE'].unique().tolist())
-
-if not clientes_opciones:
-    st.warning("No hay clientes que coincidan con los filtros seleccionados.")
-    st.stop()
 
 cliente_elegido = st.sidebar.selectbox("Seleccionar Cliente:", clientes_opciones)
 
