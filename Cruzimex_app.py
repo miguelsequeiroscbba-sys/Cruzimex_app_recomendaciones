@@ -50,19 +50,33 @@ clasificacion_sel = st.sidebar.selectbox("Seleccionar Clasificación:", clasific
 if clasificacion_sel != "TODAS":
     df_filtrado = df_filtrado[df_filtrado['CLASIFICACION'] == clasificacion_sel]
 
-# 4. Selector de Cliente (Muestra Código + Nombre de Compañía de forma segura)
+# 4. Selector de Cliente (Blindado contra nulos y errores de tipo)
 if df_filtrado.empty:
     st.sidebar.warning("⚠️ No hay clientes con esta combinación de filtros.")
     st.stop()
 
-df_filtrado['ETIQUETA_CLIENTE'] = df_filtrado['CODIGO'].astype(str) + " - " + df_filtrado['NOMBRE COMPANIA'].astype(str)
+# Asegurar que CODIGO y NOMBRE COMPANIA no tengan nulos y sean texto plano
+df_filtrado['CODIGO'] = df_filtrado['CODIGO'].fillna("").astype(str).str.strip()
+df_filtrado['NOMBRE COMPANIA'] = df_filtrado['NOMBRE COMPANIA'].fillna("Sin Nombre").astype(str).str.strip()
+
+# Crear la etiqueta de forma segura
+df_filtrado['ETIQUETA_CLIENTE'] = df_filtrado['CODIGO'] + " - " + df_filtrado['NOMBRE COMPANIA']
+
 clientes_opciones = sorted(df_filtrado['ETIQUETA_CLIENTE'].unique().tolist())
+
+if not clientes_opciones:
+    st.sidebar.warning("⚠️ No hay opciones de clientes disponibles.")
+    st.stop()
 
 cliente_elegido = st.sidebar.selectbox("Seleccionar Cliente:", clientes_opciones)
 
-# Extraer el código numérico del cliente seleccionado
-codigo_cliente = int(cliente_elegido.split(" - ")[0])
-
+# Extraer el código de vuelta a número o texto según lo maneje tu base
+codigo_cliente_str = cliente_elegido.split(" - ")[0]
+# Si tus códigos originales son numéricos (enteros), los convertimos:
+try:
+    codigo_cliente = int(codigo_cliente_str)
+except ValueError:
+    codigo_cliente = codigo_cliente_str
 top_n = st.sidebar.slider("Cantidad de recomendaciones:", min_value=1, max_value=15, value=5)
 
 # --- LÓGICA PRINCIPAL DE RECOMENDACIÓN ---
