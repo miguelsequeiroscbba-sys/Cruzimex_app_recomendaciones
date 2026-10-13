@@ -43,6 +43,13 @@ zona_sel = st.sidebar.selectbox("Seleccionar Zona:", zonas_disponibles)
 if zona_sel != "TODAS":
     df_filtrado = df_filtrado[df_filtrado['ZONA'] == zona_sel]
 
+# 3. Filtro de Ruta 
+rutas_disponibles = ["TODAS"] + sorted(df_filtrado['RUTA'].dropna().unique().tolist())
+ruta_sel = st.sidebar.selectbox("Seleccionar Ruta:", rutas_disponibles)
+
+if ruta_sel != "TODAS":
+    df_filtrado = df_filtrado[df_filtrado['RUTA'] == ruta_sel]
+
 # 3. Filtro de Clasificación / Canal
 clasificaciones_disponibles = ["TODAS"] + sorted(df_filtrado['CLASIFICACION'].dropna().unique().tolist())
 clasificacion_sel = st.sidebar.selectbox("Seleccionar Clasificación:", clasificaciones_disponibles)
